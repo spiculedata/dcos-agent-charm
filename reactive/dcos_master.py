@@ -5,11 +5,11 @@ from charmhelpers.core.host import adduser, chownr, mkdir
 from charmhelpers.fetch.archiveurl import ArchiveUrlFetchHandler
 from charmhelpers.core import hookenv
 from charmhelpers.core.hookenv import unit_private_ip, status_set, log
+from charms.reactive.helpers import data_changed
 
 basedir="/opt/mesosphere/"
 configdir="/etc/mesosphere/"
 au = ArchiveUrlFetchHandler()
-ip = unit_private_ip()
 
 @when_not('dcos-agent.installed')
 def install_dcosagent():
@@ -21,12 +21,7 @@ def install_dcosagent():
     log("fetching bootstrap")
     setupEnvVars()
     downloadBootstrap()
-    #setupMasterConfigs()
     status_set('maintenance', 'Running installer')
-    #process = check_output(["./pkgpanda", "setup"], cwd=basedir+"bin", env=setupEnvVars())
-    log("open ports")
-    hookenv.open_port(80)
-    hookenv.open_port(8181)
     set_state('dcos-agent.installed')
     status_set('active', 'DC/OS Agent Installed')
 
@@ -35,13 +30,18 @@ def install_dcosagent():
 @when('dcosmaster.available')
 @when_not('dcos-agent.ready')
 def postInt(dcosmaster):
-    setupMasterConfigs()
     status_set('maintenance', 'Running installer')
-    process = check_output(["./pkgpanda", "setup"], cwd=basedir+"bin", env=setupEnvVars())
-    log("open ports")
-    hookenv.open_port(80)
-    hookenv.open_port(8181)
+    services = dcosmaster.services()
     set_state('dcos-agent.ready')
+    if not data_changed('reverseproxy.services', services):
+        return
+    for service in services:
+        for host in service['hosts']:
+            setupMasterConfigs(host['hostname'])
+            hookenv.log('{} has a unit {}'.format(
+                service['service_name'],
+                host['hostname']))
+    process = check_output(["./pkgpanda", "setup"], cwd=basedir+"bin", env=setupEnvVars())
     status_set('active', 'DC/OS Agent Running')
 
 def createFolders():
@@ -101,10 +101,10 @@ def setupEnvVars():
     return currentenv
 
 
-def setupMasterConfigs():
+def setupMasterConfigs(ip):
     status_set('maintenance', 'Creating master configs')
     text_file=open(basedir+"packages/dcos-config--setup_b3e41695178e35239659186b92f25820c610f961/etc/exhibitor", 'w')
-    text_file.writelines(["EXHIBITOR_BACKEND=STATIC","EXHIBITOR_STATICENSEMBLE=1:"+ip])
+    text_file.writelines(["EXHIBITOR_BACKEND=STATIC\n","EXHIBITOR_STATICENSEMBLE=1:"+ip])
     text_file.close()
     text_file=open(basedir+"packages/dcos-config--setup_b3e41695178e35239659186b92f25820c610f961/etc/master_list", 'w')
     text_file.write("[\""+ip+"\"]")

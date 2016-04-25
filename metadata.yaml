@@ -1,4 +1,4 @@
-name: dcos-slave
+name: dcos-agent
 summary: Charm that creates a DC/OS Agent node.
 maintainer: Tom Barber <tom@analytical-labs.com>
 description: |
