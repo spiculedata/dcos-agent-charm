@@ -9,8 +9,8 @@ tags:
   - performance
 subordinate: false
 requires:
-  dcos:
-    interface: master
+  dcosmaster:
+    interface: dcos
 series:
    - wily
    - xenial
