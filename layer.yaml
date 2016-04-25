@@ -1,0 +1,6 @@
+includes: ['layer:basic']  # if you use any interfaces, add them here
+options:
+  basic:
+    packages:
+      - docker.io
+      - unzip
