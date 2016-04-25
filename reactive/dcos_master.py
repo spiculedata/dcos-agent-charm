@@ -30,8 +30,20 @@ def install_dcosagent():
     set_state('dcos-agent.installed')
     status_set('active', 'DC/OS Agent Installed')
 
+
 @when('dcos-agent.installed')
 @when('dcos-master.installed')
+@when_not('dcos-agent.ready')
+def postInt(dcosmaster):
+    setupMasterConfigs()
+    status_set('maintenance', 'Running installer')
+    process = check_output(["./pkgpanda", "setup"], cwd=basedir+"bin", env=setupEnvVars())
+    log("open ports")
+    hookenv.open_port(80)
+    hookenv.open_port(8181)
+    set_state('dcos-agent.ready')
+    status_set('active', 'DC/OS Agent Running')
+
 def createFolders():
     status_set('maintenance', 'Creating DC/OS Folders')
     mkdir(configdir)
@@ -87,6 +99,7 @@ def setupEnvVars():
     currentenv['PROVIDER'] = "onprem"
     currentenv['MESOS_IP_DISCOVERY_COMMAND'] = basedir+"bin/detect_ip"
     return currentenv
+
 
 def setupMasterConfigs():
     status_set('maintenance', 'Creating master configs')
