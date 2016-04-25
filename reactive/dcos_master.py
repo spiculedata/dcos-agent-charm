@@ -32,7 +32,7 @@ def install_dcosagent():
 
 
 @when('dcos-agent.installed')
-@when('dcos-master.installed')
+@when('dcos-master.available')
 @when_not('dcos-agent.ready')
 def postInt(dcosmaster):
     setupMasterConfigs()
