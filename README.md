@@ -1,64 +1,46 @@
 # Overview
 
-Describe the intended usage of this charm and anything unique about how this
-charm relates to others here.
+DC/OS is the Data Center Operating System from Mesosphere. It is built upon Apache MESOS and is designed to turn your data center into a single pool of resources that applications can utilise.
 
-This README will be displayed in the Charm Store, it should be either Markdown
-or RST. Ideal READMEs include instructions on how to use the charm, expected
-usage, and charm features that your audience might be interested in. For an
-example of a well written README check out Hadoop:
-http://jujucharms.com/charms/precise/hadoop
+Mesosphere released DC/OS open source edition to run on a number of cloud computing services and also support for Centos, this charm leverages that capability to install DC/OS inside Ubuntu using the Juju modelling framework.
 
-Use this as a Markdown reference if you need help with the formatting of this
-README: http://askubuntu.com/editing-help
-
-This charm provides [service][]. Add a description here of what the service
-itself actually does.
-
-Also remember to check the [icon guidelines][] so that your charm looks good
-in the Juju GUI.
+Juju and DC/OS make an excellent fit because it allows administrators to add new resource as simply as adding more DC/OS Agent units and deploying more applications.
 
 # Usage
 
-Step by step instructions on using the charm:
+## Warning
 
-juju deploy servicename
+**This charm is currently under heavy development and has limited testing outside of EC2**
 
-and so on. If you're providing a web service or something that the end user
-needs to go to, tell them here, especially if you're deploying a service that
-might listen to a non-default port.
+Deploying this charm:
 
-You can then browse to http://ip-address to configure the service.
+    juju deploy dcos-master
+
+Currently the dashboard is hosted on the nodes internal IP address for EC2 and supported services. The easiest way to gain access is to SSH to the node and forward port 80 to localhost:
+
+    sudo ssh ubuntu@52.51.37.150 -L 80:localhost:80
 
 ## Scale out Usage
 
-If the charm has any recommendations for running at scale, outline them in
-examples here. For example if you have a memcached relation that improves
-performance, mention it here.
+**Currently not implemented**
+DC/OS provides a master and agent setup. For fault tolerance it is recommended to run more than 1 master node, these are self configuring and distributing.
 
 ## Known Limitations and Issues
 
-This not only helps users but gives people a place to start if they want to help
-you add features to your charm.
+This charm is an initial prototype to ensure that the main services bootstrap and applications can be deployed, there will be a number of missing features and usability issues. To help get in touch! (info@spicule.co.uk)
 
 # Configuration
 
-The configuration options will be listed on the charm store, however If you're
-making assumptions or opinionated decisions in the charm (like setting a default
-administrator password), you should detail that here so the user knows how to
-change it immediately, etc.
+Currently there are no configuration options.
 
 # Contact Information
 
-Though this will be listed in the charm store itself don't assume a user will
-know that, so include that information here:
+Tom Barber - info@spicule.co.uk
 
-## Upstream Project Name
+## DC/OS master charm for Juju
 
-  - Upstream website
-  - Upstream bug tracker
-  - Upstream mailing list or contact information
-  - Feel free to add things if it's useful for users
+  - http://spicule.co.uk/dcos
+  - https://github.com/buggtb/dcos-master-charm/issues
 
 
 [service]: http://example.com
